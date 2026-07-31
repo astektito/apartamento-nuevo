@@ -1,0 +1,288 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+}
+
+.pantalla {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(160deg, #fff8e1 0%, #ffe082 45%, #ffd54f 100%);
+}
+
+/* ---------- Lluvia de flores ---------- */
+.lluvia {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.petalo {
+  position: absolute;
+  top: -40px;
+  animation-name: caer;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  opacity: 0.9;
+  will-change: transform;
+}
+
+@keyframes caer {
+  0% {
+    transform: translateY(-40px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(105vh) rotate(360deg);
+    opacity: 0.9;
+  }
+}
+
+/* ---------- Portada / sobre ---------- */
+.sobre {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  border: none;
+  border-radius: 28px;
+  padding: 48px 40px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 20px 50px rgba(191, 143, 0, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  animation: aparecer 0.6s ease both;
+  max-width: 90vw;
+}
+
+.sobre:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 26px 60px rgba(191, 143, 0, 0.45);
+}
+
+.sobre-emoji {
+  font-size: 64px;
+  animation: latido 1.8s ease-in-out infinite;
+}
+
+.sobre-titulo {
+  margin-top: 16px;
+  font-size: 26px;
+  color: #6d4c00;
+}
+
+.sobre-sub {
+  margin-top: 8px;
+  font-size: 18px;
+  color: #8a6d00;
+}
+
+.toca {
+  display: inline-block;
+  margin-top: 24px;
+  font-size: 15px;
+  color: #a67c00;
+  background: #fff3cd;
+  padding: 10px 20px;
+  border-radius: 999px;
+  animation: latido 1.8s ease-in-out infinite;
+}
+
+/* ---------- Tarjeta abierta ---------- */
+.tarjeta {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border-radius: 28px;
+  padding: 40px 32px 48px;
+  text-align: center;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(191, 143, 0, 0.35);
+  animation: aparecer 0.7s ease both;
+}
+
+.titulo {
+  margin-top: 16px;
+  font-size: 26px;
+  line-height: 1.3;
+  color: #5d4200;
+}
+
+.mensaje {
+  margin-top: 18px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #6d5200;
+}
+
+.firma {
+  margin-top: 24px;
+  font-size: 17px;
+  font-style: italic;
+  color: #8a6d00;
+}
+
+.corazon {
+  display: inline-block;
+  animation: latido 1.4s ease-in-out infinite;
+}
+
+/* ---------- Flor amarilla dibujada con CSS ---------- */
+.flor {
+  position: relative;
+  width: 200px;
+  height: 240px;
+  margin: 0 auto;
+  animation: crecer 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.tallo {
+  position: absolute;
+  left: 50%;
+  top: 120px;
+  width: 8px;
+  height: 120px;
+  margin-left: -4px;
+  background: linear-gradient(#4caf50, #2e7d32);
+  border-radius: 4px;
+  transform-origin: bottom center;
+  animation: mecer 4s ease-in-out infinite;
+}
+
+.hoja {
+  position: absolute;
+  top: 170px;
+  width: 46px;
+  height: 26px;
+  background: #43a047;
+  border-radius: 0 100% 0 100%;
+}
+
+.hoja-izq {
+  left: 58px;
+  transform: rotate(20deg);
+}
+
+.hoja-der {
+  right: 58px;
+  transform: rotate(-20deg) scaleX(-1);
+}
+
+.cabeza {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  margin-left: -60px;
+  transform-origin: center;
+  animation: girar 18s linear infinite;
+}
+
+.centro {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  background: radial-gradient(circle at 35% 35%, #8d6e00, #5d4200);
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: inset 0 0 0 4px #a67c00;
+}
+
+.petalo-flor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 70px;
+  margin: -60px 0 0 -17px;
+  background: linear-gradient(#ffe14d, #ffc107);
+  border-radius: 50% 50% 50% 50%;
+  transform-origin: center 60px;
+  box-shadow: inset 0 -6px 10px rgba(191, 143, 0, 0.25);
+}
+
+/* ---------- Animaciones ---------- */
+@keyframes latido {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes crecer {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes girar {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes mecer {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .cabeza,
+  .tallo,
+  .petalo {
+    animation: none !important;
+  }
+}
