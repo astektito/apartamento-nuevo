@@ -33,7 +33,7 @@ body {
   z-index: 0;
 }
 
-.petalo {
+.petalo-cae {
   position: absolute;
   top: -40px;
   animation-name: caer;
@@ -116,14 +116,14 @@ body {
   border-radius: 28px;
   padding: 40px 32px 48px;
   text-align: center;
-  max-width: 460px;
+  max-width: 480px;
   width: 100%;
   box-shadow: 0 20px 50px rgba(191, 143, 0, 0.35);
   animation: aparecer 0.7s ease both;
 }
 
 .titulo {
-  margin-top: 16px;
+  margin-top: 8px;
   font-size: 26px;
   line-height: 1.3;
   color: #5d4200;
@@ -148,82 +148,151 @@ body {
   animation: latido 1.4s ease-in-out infinite;
 }
 
-/* ---------- Flor amarilla dibujada con CSS ---------- */
-.flor {
+/* ---------- Ramo de tulipanes amarillos (CSS) ---------- */
+.ramo {
   position: relative;
-  width: 200px;
-  height: 240px;
-  margin: 0 auto;
+  height: 210px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0;
   animation: crecer 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.tulipan {
+  position: relative;
+  width: 70px;
+  height: 200px;
+  transform-origin: bottom center;
+}
+
+.tulipan.t-izq {
+  transform: rotate(-14deg) translateX(18px);
+  z-index: 1;
+  animation: mecer 4.5s ease-in-out infinite;
+}
+.tulipan.t-cen {
+  z-index: 3;
+  animation: mecer 4s ease-in-out infinite;
+}
+.tulipan.t-der {
+  transform: rotate(14deg) translateX(-18px);
+  z-index: 2;
+  animation: mecer 5s ease-in-out infinite reverse;
+}
+
+/* Flor del tulipán (copa formada por 3 pétalos) */
+.bloom {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 56px;
+  height: 66px;
+  margin-left: -28px;
+  z-index: 2;
+}
+
+.bloom .petalo {
+  position: absolute;
+  bottom: 0;
+  width: 30px;
+  height: 60px;
+  border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
+  background: linear-gradient(#ffe14d, #ffc107);
+  box-shadow: inset 0 -6px 10px rgba(191, 143, 0, 0.25);
+}
+
+.bloom .p-cen {
+  left: 50%;
+  margin-left: -15px;
+  z-index: 2;
+  height: 64px;
+}
+.bloom .p-izq {
+  left: 2px;
+  transform: rotate(-14deg);
+  transform-origin: bottom center;
+  background: linear-gradient(#ffd633, #f5b400);
+}
+.bloom .p-der {
+  right: 2px;
+  transform: rotate(14deg);
+  transform-origin: bottom center;
+  background: linear-gradient(#ffd633, #f5b400);
 }
 
 .tallo {
   position: absolute;
+  top: 58px;
   left: 50%;
-  top: 120px;
-  width: 8px;
-  height: 120px;
-  margin-left: -4px;
+  width: 7px;
+  height: 145px;
+  margin-left: -3.5px;
   background: linear-gradient(#4caf50, #2e7d32);
   border-radius: 4px;
-  transform-origin: bottom center;
-  animation: mecer 4s ease-in-out infinite;
+  z-index: 1;
 }
 
 .hoja {
   position: absolute;
-  top: 170px;
-  width: 46px;
-  height: 26px;
+  top: 105px;
+  width: 40px;
+  height: 22px;
   background: #43a047;
   border-radius: 0 100% 0 100%;
+  z-index: 0;
 }
-
-.hoja-izq {
-  left: 58px;
-  transform: rotate(20deg);
-}
-
 .hoja-der {
-  right: 58px;
-  transform: rotate(-20deg) scaleX(-1);
+  left: 50%;
+  transform: rotate(-25deg);
+}
+.hoja-izq {
+  right: 50%;
+  transform: rotate(25deg) scaleX(-1);
 }
 
-.cabeza {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  width: 120px;
-  height: 120px;
-  margin-left: -60px;
-  transform-origin: center;
-  animation: girar 18s linear infinite;
+/* ---------- Galería de fotos ---------- */
+.galeria {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
 }
 
-.centro {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 58px;
-  height: 58px;
-  margin: -29px 0 0 -29px;
-  background: radial-gradient(circle at 35% 35%, #8d6e00, #5d4200);
+/* Cuando hay una sola foto, se muestra completa y grande */
+.galeria:has(.foto:only-child) {
+  grid-template-columns: 1fr;
+}
+
+.foto {
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(191, 143, 0, 0.25);
+  border: 3px solid #fff;
+  background: #fff;
+}
+
+/* ---------- Botón de música ---------- */
+.btn-musica {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 5;
+  width: 52px;
+  height: 52px;
+  border: none;
   border-radius: 50%;
-  z-index: 2;
-  box-shadow: inset 0 0 0 4px #a67c00;
+  font-size: 22px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 20px rgba(191, 143, 0, 0.35);
+  transition: transform 0.2s ease;
 }
-
-.petalo-flor {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 34px;
-  height: 70px;
-  margin: -60px 0 0 -17px;
-  background: linear-gradient(#ffe14d, #ffc107);
-  border-radius: 50% 50% 50% 50%;
-  transform-origin: center 60px;
-  box-shadow: inset 0 -6px 10px rgba(191, 143, 0, 0.25);
+.btn-musica:hover {
+  transform: scale(1.1);
 }
 
 /* ---------- Animaciones ---------- */
@@ -259,15 +328,6 @@ body {
   }
 }
 
-@keyframes girar {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes mecer {
   0%,
   100% {
@@ -278,11 +338,19 @@ body {
   }
 }
 
+/* El mecer no debe pisar la rotación base de los tulipanes laterales */
+.tulipan.t-izq,
+.tulipan.t-der {
+  animation: none;
+}
+.tulipan.t-cen {
+  animation: mecer 4s ease-in-out infinite;
+}
+
 /* Respeta a quien prefiere menos movimiento */
 @media (prefers-reduced-motion: reduce) {
-  .cabeza,
-  .tallo,
-  .petalo {
+  .tulipan,
+  .petalo-cae {
     animation: none !important;
   }
 }
