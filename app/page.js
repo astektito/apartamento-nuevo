@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
    ✏️  PERSONALIZA AQUÍ (cambia estos textos y ya está)
    ========================================================= */
 const CONFIG = {
-  paraQuien: "Para Eve 🌷",
+  paraQuien: "Para Eve 🌼",
   titulo: "¡Felicidades Eve por tu nuevo apartamento!",
   mensaje:
     "Que este nuevo hogar se llene de risas, buenos momentos y muchos recuerdos bonitos. Te lo mereces todo. 💛",
@@ -35,7 +35,7 @@ export default function Home() {
       delay: Math.random() * 8,
       duration: 7 + Math.random() * 8,
       size: 14 + Math.random() * 18,
-      emoji: Math.random() > 0.5 ? "🌷" : "🌼",
+      emoji: Math.random() > 0.5 ? "🌻" : "🌼",
     }));
     setPetalos(nuevos);
   }, []);
