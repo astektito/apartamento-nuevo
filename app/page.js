@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
    ✏️  PERSONALIZA AQUÍ (cambia estos textos y ya está)
    ========================================================= */
 const CONFIG = {
-  paraQuien: "Para Eve 🌼",
+  paraQuien: "Para Eve",
   titulo: "¡Felicidades Eve por tu nuevo apartamento!",
   mensaje:
     "Que este nuevo hogar se llene de risas, buenos momentos y muchos recuerdos bonitos. Te lo mereces todo. 💛",
@@ -35,6 +35,7 @@ export default function Home() {
       delay: Math.random() * 8,
       duration: 7 + Math.random() * 8,
       size: 14 + Math.random() * 18,
+      tipo: Math.random() > 0.5 ? "girasol" : "tulipan",
     }));
     setPetalos(nuevos);
   }, []);
@@ -112,9 +113,10 @@ export default function Home() {
               left: `${p.left}%`,
               animationDelay: `${p.delay}s`,
               animationDuration: `${p.duration}s`,
+              fontSize: `${p.size + 8}px`,
             }}
           >
-            <TulipanMini size={p.size + 6} />
+            {p.tipo === "girasol" ? "🌻" : <TulipanMini size={p.size + 6} />}
           </span>
         ))}
       </div>
@@ -124,7 +126,12 @@ export default function Home() {
         <button className="sobre" onClick={abrir}>
           <div className="sobre-emoji">💌</div>
           <h1 className="sobre-titulo">Una sorpresa para ti</h1>
-          <p className="sobre-sub">{CONFIG.paraQuien}</p>
+          <p className="sobre-sub">
+            {CONFIG.paraQuien}
+            <span className="tulipan-inline">
+              <TulipanMini size={20} />
+            </span>
+          </p>
           <span className="toca">Toca para abrir 👆</span>
         </button>
       ) : (
