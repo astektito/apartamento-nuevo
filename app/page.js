@@ -35,7 +35,6 @@ export default function Home() {
       delay: Math.random() * 8,
       duration: 7 + Math.random() * 8,
       size: 14 + Math.random() * 18,
-      emoji: Math.random() > 0.5 ? "🌻" : "🌼",
     }));
     setPetalos(nuevos);
   }, []);
@@ -77,6 +76,27 @@ export default function Home() {
     </div>
   );
 
+  // Tulipán amarillo pequeño (dibujado) para la lluvia de fondo
+  const TulipanMini = ({ size }) => (
+    <svg
+      width={size}
+      height={size * 1.4}
+      viewBox="0 0 24 34"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* tallo */}
+      <path d="M12 14 V33" stroke="#43a047" strokeWidth="2" strokeLinecap="round" />
+      {/* hojas */}
+      <path d="M12 24 C7 22 5 26 6 29 C10 29 12 27 12 24 Z" fill="#4caf50" />
+      <path d="M12 22 C17 20 19 24 18 27 C14 27 12 25 12 22 Z" fill="#66bb6a" />
+      {/* copa del tulipán (3 pétalos) */}
+      <path d="M4 8 C4 3 7 1 8 1 C8 6 8 12 6 14 C4 13 4 11 4 8 Z" fill="#f5b400" />
+      <path d="M20 8 C20 3 17 1 16 1 C16 6 16 12 18 14 C20 13 20 11 20 8 Z" fill="#f5b400" />
+      <path d="M12 1 C9 1 6 3 6 9 C6 12 8 14 12 14 C16 14 18 12 18 9 C18 3 15 1 12 1 Z" fill="#ffd633" />
+    </svg>
+  );
+
   return (
     <main className="pantalla">
       {/* Audio (se reproduce al abrir) */}
@@ -92,10 +112,9 @@ export default function Home() {
               left: `${p.left}%`,
               animationDelay: `${p.delay}s`,
               animationDuration: `${p.duration}s`,
-              fontSize: `${p.size}px`,
             }}
           >
-            {p.emoji}
+            <TulipanMini size={p.size + 6} />
           </span>
         ))}
       </div>
