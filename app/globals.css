@@ -7,6 +7,7 @@
 html,
 body {
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -158,6 +159,61 @@ body {
 .corazon {
   display: inline-block;
   animation: latido 1.4s ease-in-out infinite;
+}
+
+/* Corazón secreto: se ve igual que el 💛 normal pero es pulsable */
+.corazon-envoltura {
+  position: relative;
+  display: inline-block;
+}
+.corazon-secreto {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+/* Una vez revelado el regalo, deja de invitar a tocarlo */
+.corazon-secreto.corazon-usado {
+  cursor: default;
+  animation: none;
+}
+
+/* Corazoncitos que salen disparados desde el corazón */
+.chispa {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  animation: estallar 0.9s ease-out forwards;
+  z-index: 4;
+}
+
+@keyframes estallar {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--dx)),
+        calc(-50% + var(--dy))
+      )
+      scale(1.1);
+  }
+}
+
+/* El botón de la cuponera entra con un "pop" de sorpresa,
+   tras un pequeño respiro para que se luzca el estallido */
+.btn-cuponera-sorpresa {
+  animation: crecer 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both;
 }
 
 /* ---------- Ramo de tulipanes amarillos (CSS) ---------- */
@@ -348,20 +404,305 @@ body {
   }
 }
 
+/* ---------- Cuponera ---------- */
+.btn-cuponera {
+  margin-top: 28px;
+  border: none;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  color: #6d4c00;
+  background: linear-gradient(#ffe14d, #ffc107);
+  padding: 14px 28px;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(191, 143, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-cuponera:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 26px rgba(191, 143, 0, 0.45);
+}
+
+/* Fondo oscuro del modal */
+.cuponera-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(80, 55, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: aparecer 0.3s ease both;
+  overflow-y: auto;
+}
+
+/* Tarjeta de la cuponera */
+.cuponera {
+  position: relative;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 28px;
+  padding: 0 24px 32px;
+  max-width: 460px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 24px 60px rgba(191, 143, 0, 0.45);
+  animation: crecer 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.cuponera-cerrar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  color: #6d4c00;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(191, 143, 0, 0.35);
+  transition: transform 0.2s ease;
+}
+.cuponera-cerrar:hover {
+  transform: scale(1.1);
+}
+
+.cuponera-portada {
+  width: calc(100% + 48px);
+  margin-left: -24px;
+  height: auto;
+  border-radius: 28px 28px 0 0;
+  display: block;
+}
+
+.cuponera-titulo {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 24px;
+  color: #5d4200;
+}
+
+.cuponera-sub {
+  margin-top: 6px;
+  text-align: center;
+  font-size: 15px;
+  color: #8a6d00;
+}
+
+.cupones {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cupon {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, #fff8e1, #ffecb3);
+  border: 2px dashed #ffca28;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.cupon-emoji {
+  font-size: 30px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cupon-titulo {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+  color: #6d5200;
+  text-align: left;
+}
+
+.cupon-btn {
+  flex-shrink: 0;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(#ffb300, #f57f17);
+  padding: 9px 16px;
+  border-radius: 999px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 10px rgba(191, 143, 0, 0.3);
+}
+.cupon-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+/* Cupón ya reclamado: se atenúa y el botón queda inactivo */
+.cupon-usado {
+  opacity: 0.55;
+  filter: grayscale(0.4);
+}
+.cupon-usado .cupon-titulo {
+  text-decoration: line-through;
+}
+.cupon-btn:disabled {
+  cursor: default;
+  color: #7a6a3a;
+  background: #e0d6b8;
+  box-shadow: none;
+}
+
+/* ---------- Hada que cruza al reclamar un cupón ---------- */
+.hada-vuelo {
+  position: fixed;
+  top: 22%;
+  left: 0;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 30px rgba(191, 143, 0, 0.4);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hada-emoji {
+  font-size: 34px;
+  line-height: 1;
+  animation: aletear 0.5s ease-in-out infinite;
+}
+
+.hada-estela {
+  font-size: 16px;
+  letter-spacing: -2px;
+  opacity: 0.85;
+}
+
+.hada-mensaje {
+  font-size: 16px;
+  font-weight: 700;
+  color: #7a5600;
+}
+
+/* Ida: entra por la izquierda, cruza y sale por la derecha */
+.hada-ida {
+  animation: cruzar-ida var(--hada-dur, 3.2s) ease-in-out both;
+}
+/* Vuelta: al revés, mirando hacia la izquierda */
+.hada-vuelta {
+  left: auto;
+  right: 0;
+  flex-direction: row-reverse;
+  animation: cruzar-vuelta var(--hada-dur, 3.2s) ease-in-out both;
+}
+/* El hada de vuelta mira hacia el otro lado */
+.hada-vuelta .hada-emoji {
+  transform: scaleX(-1);
+}
+
+@keyframes aletear {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(4deg);
+  }
+}
+
+/* Cruza de izquierda a derecha, con una pausa a mitad para leer el mensaje */
+@keyframes cruzar-ida {
+  0% {
+    transform: translateX(-110%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  35%,
+  65% {
+    transform: translateX(calc(50vw - 50%));
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(110vw);
+    opacity: 0;
+  }
+}
+
+/* Cruza de derecha a izquierda */
+@keyframes cruzar-vuelta {
+  0% {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  35%,
+  65% {
+    transform: translateX(calc(-50vw + 50%));
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-110vw);
+    opacity: 0;
+  }
+}
+
 /* Respeta a quien prefiere menos movimiento */
 @media (prefers-reduced-motion: reduce) {
   .tulipan,
   .petalo-cae,
   .sobre-emoji,
   .toca,
-  .corazon {
+  .corazon,
+  .chispa,
+  .hada-emoji {
     animation: none !important;
+  }
+
+  /* Sin movimiento, los corazoncitos ni siquiera se muestran */
+  .chispa {
+    display: none;
+  }
+
+  /* El hada no cruza volando: aparece centrada y legible, y se va sola */
+  .hada-vuelo,
+  .hada-ida,
+  .hada-vuelta {
+    animation: aparecer 0.3s ease both !important;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    flex-direction: row;
   }
 
   /* Atenúa las animaciones de entrada en lugar de eliminarlas por completo */
   .sobre,
   .tarjeta,
-  .ramo {
+  .ramo,
+  .cuponera-fondo,
+  .cuponera,
+  .btn-cuponera-sorpresa {
     animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
   }
 }

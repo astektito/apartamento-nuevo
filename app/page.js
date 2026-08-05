@@ -18,8 +18,22 @@ const CONFIG = {
   // 🖼️ Fotos: pon las imágenes en public/fotos/ y escribe aquí sus nombres.
   //    Ejemplo: fotos: ["foto1.jpg", "foto2.jpg", "foto3.jpg"]
   fotos: ["677b828e-0bb0-41eb-b0b1-527d1f0c04a7.png"],
+
+  // 🎁 Cuponera: imagen de portada (en public/fotos/) y los cupones a reclamar.
+  cuponeraPortada: "cuponera.png",
+  cupones: [
+    { emoji: "🎬", titulo: "Ir al cine" },
+    { emoji: "🍣", titulo: "Ir por sushi" },
+    { emoji: "🍢", titulo: "Ir a Malchingi" },
+    { emoji: "👗", titulo: "Un vestido amarillo nuevo" },
+    { emoji: "✨", titulo: "Cumplir un deseo" },
+    { emoji: "🌆", titulo: "Una tarde en el centro" },
+  ],
 };
 /* ========================================================= */
+
+// Clave donde se guardan los cupones ya reclamados (persisten al recargar)
+const CUPONES_STORAGE_KEY = "cupones-reclamados";
 
 /* Parámetros de la lluvia de pétalos/flores del fondo */
 const PETALOS_CANTIDAD = 22; // número de flores que caen
@@ -29,11 +43,148 @@ const PETALOS_DURACION_EXTRA = 8; // duración extra aleatoria (s)
 const PETALOS_TAMANO_MIN = 14; // tamaño mínimo (px)
 const PETALOS_TAMANO_EXTRA = 18; // tamaño extra aleatorio (px)
 
+/* Estallido de corazoncitos al tocar el corazón secreto 💛 */
+const ESTALLIDO_CANTIDAD = 14; // corazoncitos que salen disparados
+const ESTALLIDO_EMOJIS = ["💛", "💖", "✨", "🧡", "💫"];
+const ESTALLIDO_DURACION_MS = 900; // cuánto tarda en desaparecer y salir el botón
+
+/* Hada que cruza al reclamar un cupón */
+const HADA_DURACION_MS = 3200; // cuánto se ve el hada antes de irse
+const ORDINALES = [
+  "primer",
+  "segundo",
+  "tercer",
+  "cuarto",
+  "quinto",
+  "sexto",
+  "séptimo",
+  "octavo",
+  "noveno",
+  "décimo",
+];
+
 export default function Home() {
   const [abierto, setAbierto] = useState(false);
   const [sonando, setSonando] = useState(false);
   const [petalos, setPetalos] = useState([]);
+  const [cuponeraAbierta, setCuponeraAbierta] = useState(false);
+  // El botón de la cuponera está oculto hasta tocar el corazón secreto 💛
+  const [regaloRevelado, setRegaloRevelado] = useState(false);
+  // Corazoncitos que estallan al tocar el corazón secreto
+  const [estallido, setEstallido] = useState([]);
+  const [reclamados, setReclamados] = useState([]);
+  // Hada que cruza la pantalla al reclamar/soltar un cupón
+  const [hada, setHada] = useState(null);
+  const hadaTimeout = useRef(null);
   const audioRef = useRef(null);
+
+  // Cargar los cupones ya reclamados. Primero se pintan al instante los que
+  // haya en localStorage (respuesta inmediata), y en seguida se pide al
+  // servidor el estado real y compartido entre todos los dispositivos.
+  useEffect(() => {
+    try {
+      const guardado = localStorage.getItem(CUPONES_STORAGE_KEY);
+      if (guardado) setReclamados(JSON.parse(guardado));
+    } catch {
+      // Si localStorage no está disponible, simplemente empieza vacío
+    }
+
+    let vigente = true;
+    fetch("/api/cupones")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((datos) => {
+        if (!vigente || !datos || !Array.isArray(datos.reclamados)) return;
+        setReclamados(datos.reclamados);
+        try {
+          localStorage.setItem(
+            CUPONES_STORAGE_KEY,
+            JSON.stringify(datos.reclamados)
+          );
+        } catch {}
+      })
+      .catch(() => {
+        // Sin conexión con el servidor: seguimos con lo de localStorage
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, []);
+
+  // Muestra al hada cruzando la pantalla con un mensaje. La dirección alterna
+  // en cada reclamo (ida →, vuelta ←) para dar variedad.
+  const volarHada = (mensaje, direccion) => {
+    if (hadaTimeout.current) clearTimeout(hadaTimeout.current);
+    // La key fuerza a React a reiniciar la animación si se reclama seguido.
+    setHada((prev) => ({ mensaje, direccion, key: (prev?.key ?? 0) + 1 }));
+    hadaTimeout.current = setTimeout(() => setHada(null), HADA_DURACION_MS);
+  };
+
+  const reclamarCupon = (indice) => {
+    if (reclamados.includes(indice)) return;
+
+    // Actualización optimista: se marca al instante para que se sienta ágil.
+    const actualizado = [...reclamados, indice];
+    setReclamados(actualizado);
+    try {
+      localStorage.setItem(CUPONES_STORAGE_KEY, JSON.stringify(actualizado));
+    } catch {
+      // Ignorar si no se puede guardar
+    }
+
+    // El hada cruza anunciando el logro
+    const cuantos = actualizado.length;
+    const ordinal = ORDINALES[cuantos - 1] ?? `${cuantos}º`;
+    const mensaje =
+      cuantos === CONFIG.cupones.length
+        ? "¡Reclamaste todos tus cupones! 🎉"
+        : `¡Reclamaste tu ${ordinal} cupón! ✨`;
+    volarHada(mensaje, cuantos % 2 === 1 ? "ida" : "vuelta");
+
+    // Guardar en el servidor para que se comparta entre dispositivos.
+    fetch("/api/cupones", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ indice }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((datos) => {
+        if (!datos || !Array.isArray(datos.reclamados)) return;
+        setReclamados(datos.reclamados);
+        try {
+          localStorage.setItem(
+            CUPONES_STORAGE_KEY,
+            JSON.stringify(datos.reclamados)
+          );
+        } catch {}
+      })
+      .catch(() => {
+        // Sin conexión: queda guardado en localStorage y se sincroniza luego
+      });
+  };
+
+  // Toca el corazón secreto: estalla en corazoncitos y luego aparece el botón
+  const revelarRegalo = () => {
+    if (regaloRevelado) return;
+    const chispas = Array.from({ length: ESTALLIDO_CANTIDAD }, (_, i) => {
+      const angulo = (360 / ESTALLIDO_CANTIDAD) * i + Math.random() * 20;
+      const distancia = 70 + Math.random() * 60; // px que recorre
+      const rad = (angulo * Math.PI) / 180;
+      return {
+        id: i,
+        emoji:
+          ESTALLIDO_EMOJIS[Math.floor(Math.random() * ESTALLIDO_EMOJIS.length)],
+        dx: Math.cos(rad) * distancia,
+        dy: Math.sin(rad) * distancia,
+        delay: Math.random() * 120, // ms
+        size: 16 + Math.random() * 16,
+      };
+    });
+    setEstallido(chispas);
+    setRegaloRevelado(true);
+    // Limpia los corazoncitos cuando termina la animación
+    setTimeout(() => setEstallido([]), ESTALLIDO_DURACION_MS);
+  };
 
   // Generar los pétalos que caen (solo en cliente para evitar desajustes)
   useEffect(() => {
@@ -46,6 +197,13 @@ export default function Home() {
       tipo: Math.random() > 0.5 ? "girasol" : "tulipan",
     }));
     setPetalos(nuevos);
+  }, []);
+
+  // Al desmontar, cancela el temporizador pendiente del hada
+  useEffect(() => {
+    return () => {
+      if (hadaTimeout.current) clearTimeout(hadaTimeout.current);
+    };
   }, []);
 
   const abrir = () => {
@@ -171,9 +329,127 @@ export default function Home() {
           )}
 
           <p className="firma">
-            {CONFIG.firma} <span className="corazon">💛</span>
+            {CONFIG.firma}{" "}
+            <span className="corazon-envoltura">
+              <button
+                type="button"
+                className={`corazon corazon-secreto${
+                  regaloRevelado ? " corazon-usado" : ""
+                }`}
+                onClick={revelarRegalo}
+                aria-label={
+                  regaloRevelado
+                    ? "Corazón"
+                    : "Toca el corazón, hay una sorpresa"
+                }
+              >
+                💛
+              </button>
+
+              {/* Estallido de corazoncitos al tocar el corazón */}
+              {estallido.map((c) => (
+                <span
+                  key={c.id}
+                  className="chispa"
+                  aria-hidden="true"
+                  style={{
+                    "--dx": `${c.dx}px`,
+                    "--dy": `${c.dy}px`,
+                    fontSize: `${c.size}px`,
+                    animationDelay: `${c.delay}ms`,
+                  }}
+                >
+                  {c.emoji}
+                </span>
+              ))}
+            </span>
           </p>
+
+          {/* Botón secreto: aparece solo al tocar el corazón 💛 */}
+          {regaloRevelado && (
+            <button
+              className="btn-cuponera btn-cuponera-sorpresa"
+              onClick={() => setCuponeraAbierta(true)}
+            >
+              🎁 Abrir tu cuponera
+            </button>
+          )}
         </section>
+      )}
+
+      {/* ---- Modal de la cuponera ---- */}
+      {cuponeraAbierta && (
+        <div
+          className="cuponera-fondo"
+          onClick={() => setCuponeraAbierta(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Cuponera de regalos"
+        >
+          <div className="cuponera" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="cuponera-cerrar"
+              onClick={() => setCuponeraAbierta(false)}
+              aria-label="Cerrar cuponera"
+            >
+              ✕
+            </button>
+
+            <img
+              src={`/fotos/${CONFIG.cuponeraPortada}`}
+              alt="Cuponera"
+              className="cuponera-portada"
+              loading="lazy"
+            />
+
+            <h2 className="cuponera-titulo">Tu cuponera 💛</h2>
+            <p className="cuponera-sub">
+              Reclama cada cupón cuando quieras. Puedo cumplirlos todos. ✨
+            </p>
+
+            <div className="cupones">
+              {CONFIG.cupones.map((c, i) => {
+                const reclamado = reclamados.includes(i);
+                return (
+                  <div
+                    key={i}
+                    className={`cupon ${reclamado ? "cupon-usado" : ""}`}
+                  >
+                    <span className="cupon-emoji" aria-hidden="true">
+                      {c.emoji}
+                    </span>
+                    <span className="cupon-titulo">{c.titulo}</span>
+                    <button
+                      className="cupon-btn"
+                      onClick={() => reclamarCupon(i)}
+                      disabled={reclamado}
+                    >
+                      {reclamado ? "Reclamado ✓" : "Reclamar"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hada que cruza la pantalla al reclamar un cupón */}
+      {hada && (
+        <div
+          key={hada.key}
+          className={`hada-vuelo hada-${hada.direccion}`}
+          role="status"
+          aria-live="polite"
+        >
+          <span className="hada-emoji" aria-hidden="true">
+            🧚‍♀️
+          </span>
+          <span className="hada-estela" aria-hidden="true">
+            ✨💫⭐️
+          </span>
+          <span className="hada-mensaje">{hada.mensaje}</span>
+        </div>
       )}
 
       {/* Botón de música */}
