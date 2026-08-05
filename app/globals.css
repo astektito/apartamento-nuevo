@@ -181,7 +181,6 @@ body {
 .tulipan.t-izq {
   transform: rotate(-14deg) translateX(18px);
   z-index: 1;
-  animation: mecer 4.5s ease-in-out infinite;
 }
 .tulipan.t-cen {
   z-index: 3;
@@ -190,7 +189,6 @@ body {
 .tulipan.t-der {
   transform: rotate(14deg) translateX(-18px);
   z-index: 2;
-  animation: mecer 5s ease-in-out infinite reverse;
 }
 
 /* Flor del tulipán (copa formada por 3 pétalos) */
@@ -350,19 +348,20 @@ body {
   }
 }
 
-/* El mecer no debe pisar la rotación base de los tulipanes laterales */
-.tulipan.t-izq,
-.tulipan.t-der {
-  animation: none;
-}
-.tulipan.t-cen {
-  animation: mecer 4s ease-in-out infinite;
-}
-
 /* Respeta a quien prefiere menos movimiento */
 @media (prefers-reduced-motion: reduce) {
   .tulipan,
-  .petalo-cae {
+  .petalo-cae,
+  .sobre-emoji,
+  .toca,
+  .corazon {
     animation: none !important;
+  }
+
+  /* Atenúa las animaciones de entrada en lugar de eliminarlas por completo */
+  .sobre,
+  .tarjeta,
+  .ramo {
+    animation-duration: 0.001s !important;
   }
 }
