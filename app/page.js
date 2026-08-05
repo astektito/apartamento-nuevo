@@ -21,6 +21,14 @@ const CONFIG = {
 };
 /* ========================================================= */
 
+/* Parámetros de la lluvia de pétalos/flores del fondo */
+const PETALOS_CANTIDAD = 22; // número de flores que caen
+const PETALOS_DELAY_MAX = 8; // retardo máximo de inicio (s)
+const PETALOS_DURACION_MIN = 7; // duración mínima de caída (s)
+const PETALOS_DURACION_EXTRA = 8; // duración extra aleatoria (s)
+const PETALOS_TAMANO_MIN = 14; // tamaño mínimo (px)
+const PETALOS_TAMANO_EXTRA = 18; // tamaño extra aleatorio (px)
+
 export default function Home() {
   const [abierto, setAbierto] = useState(false);
   const [sonando, setSonando] = useState(false);
@@ -29,12 +37,12 @@ export default function Home() {
 
   // Generar los pétalos que caen (solo en cliente para evitar desajustes)
   useEffect(() => {
-    const nuevos = Array.from({ length: 22 }, (_, i) => ({
+    const nuevos = Array.from({ length: PETALOS_CANTIDAD }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
-      delay: Math.random() * 8,
-      duration: 7 + Math.random() * 8,
-      size: 14 + Math.random() * 18,
+      delay: Math.random() * PETALOS_DELAY_MAX,
+      duration: PETALOS_DURACION_MIN + Math.random() * PETALOS_DURACION_EXTRA,
+      size: PETALOS_TAMANO_MIN + Math.random() * PETALOS_TAMANO_EXTRA,
       tipo: Math.random() > 0.5 ? "girasol" : "tulipan",
     }));
     setPetalos(nuevos);
@@ -101,7 +109,7 @@ export default function Home() {
   return (
     <main className="pantalla">
       {/* Audio (se reproduce al abrir) */}
-      <audio ref={audioRef} src={CONFIG.musica} loop preload="auto" />
+      <audio ref={audioRef} src={CONFIG.musica} loop preload="none" />
 
       {/* Pétalos / flores cayendo de fondo */}
       <div className="lluvia" aria-hidden="true">
@@ -170,7 +178,12 @@ export default function Home() {
 
       {/* Botón de música */}
       {abierto && (
-        <button className="btn-musica" onClick={toggleMusica} title="Música">
+        <button
+          className="btn-musica"
+          onClick={toggleMusica}
+          title="Música"
+          aria-label={sonando ? "Silenciar música" : "Activar música"}
+        >
           {sonando ? "🔊" : "🔇"}
         </button>
       )}
